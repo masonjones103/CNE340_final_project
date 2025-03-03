@@ -17,7 +17,7 @@ for sheet_name, url in urls.items():
         print(f"Importing {sheet_name}...")
 
 # reads csv data from url
-        df = pd.read_csv(url)
+        df = pd.read_csv(url, header=1)
 
 # saves dataframe to mysql
         df.to_sql(name=sheet_name, con=engine, if_exists="replace", index=False, method="multi")
