@@ -35,9 +35,6 @@ Kaylie's analysis:
 Press enter:
 ''')
 
-def analysis_1():
-    temp_df = df.loc[:10]
-
 # Drivers vs. AC & WG
 df = df.loc[:10]
 
