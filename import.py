@@ -2,7 +2,7 @@
 # Mason Jones
 # Will Dunlap
 # 02/28/2025
-# CNE 335
+# CNE 340
 # Code performs data analytics on a database stored in WAMP using pandas code functions. In our code we are retrieving
 # data from a Mario Kart google document and analyzing the data and executing it to a visual graph.
 
