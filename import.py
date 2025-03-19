@@ -2,6 +2,7 @@
 # Mason Jones
 # Will Dunlap
 # 02/28/2025
+# CNE 335
 # Code performs data analytics on a database stored in WAMP using pandas code functions. In our code we are retrieving
 # data from a Mario Kart google document and analyzing the data and executing it to a visual graph.
 
@@ -10,31 +11,27 @@ import numpy as np
 import pandas as pd  # install panda
 from sqlalchemy import create_engine  # install sqlalchemy
 
-# urls for data
+# url for data
 url = "https://docs.google.com/spreadsheets/d/1QZ3EeNsdmd1R6Ahow5xr6Z_CcnvdHYm2uVXsivKFOa8/export?format=csv&gid=0"
 
-# creates engine for sql alchemy and mysql stuff
-hostname = "127.0.0.1"
-uname = "root"
-pwd = ""
-dbname = "mario_kart"
-
+# creates engine using sql alchemy and mysql
 engine = create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}"
                        .format(user="root", pw="", host="127.0.0.1", db="mario_kart"))
 
-# loops each sheet and reads it into dataframe
-
-print(f"Importing Drivers...")
+print("Importing Drivers...")
 
 # reads csv data from url
 df = pd.read_csv(url, header=1)
 
+# adds values to a column and drops unneeded column
 if "Driver" in df.columns and "Unnamed: 2" in df.columns:
     df["Driver"] = df["Driver"].fillna(df["Unnamed: 2"])
     df.drop(columns=["Unnamed: 2"], inplace=True)
 
+# drops unneeded last row
 df = df.drop(52, axis=0)
 
+# converts pandas dataframe to sql
 df.to_sql(name='stats_drivers', con=engine, if_exists="replace", index=False, method="multi")
 
 print("data has been imported")
@@ -46,7 +43,18 @@ Mason's new analysis:
 Press enter:
 ''')
 
+# column names stored as a list
 column_names_list = ['WG', 'AC', 'ON', 'OF', 'MT', 'SL', 'SW', 'SA', 'SG', 'TL', 'TW', 'TA', 'TG', 'IV']
+
+# takes the drivers names you would like to compare
+def select_driver_one():
+    driver_one = input('''Type the name of the first driver you would like to select.
+    >''').title()
+    return driver_one
+def select_driver_two():
+    driver_two = input('''Type the name of the second driver you would like to select.
+    >''').title()
+    return driver_two
 
 # takes the name given from select_driver_#, iterates through each row of temp_table['Driver],
 # dropping all text after '\n' if it appears, then if the given name is equal to the row's name,
@@ -70,24 +78,13 @@ def remove_name(index):
         i += 1
     return value_list
 
-# takes the drivers names you would like to compare
-def select_driver_one():
-    driver_one = input('''Type the name of the first driver you would like to select.
-    >''').title()
-    return driver_one
-def select_driver_two():
-    driver_two = input('''Type the name of the second driver you would like to select.
-    >''').title()
-    return driver_two
-
 # attempts to get the values of a driver you input, if the name is invalid a TypeError occurs and the function runs again.
 def get_driver_one_values():
     try:
         driver_one_index, driver_one_name = find_driver(select_driver_one())
         driver_one_values = remove_name(driver_one_index)
         return driver_one_name, driver_one_values
-    except TypeError as e:
-        print(e)
+    except TypeError:
         print('Driver not found, try again.')
         return get_driver_one_values()
 def get_driver_two_values():
@@ -98,6 +95,15 @@ def get_driver_two_values():
     except TypeError:
         print('Driver not found, try again.')
         return get_driver_two_values()
+
+# removes the star symbol from values and converts them to an integer
+def remove_stars(values):
+    i = 0
+    for value in values:
+        values[i] = value.replace('🟊', '')
+        values[i] = int(values[i])
+        i += 1
+    return values
 
 # compares driver values to find the one with the higher values and outputs the names and who is faster.
 def compare_drivers(d1_name_input, d1_values_input, d2_name_input, d2_values_input):
@@ -110,21 +116,15 @@ def compare_drivers(d1_name_input, d1_values_input, d2_name_input, d2_values_inp
     else:
         return '\n> Drivers have equal speeds <'
 
-# removes the star symbol from values and converts them to an integer
-def remove_stars(values):
-    i = 0
-    for value in values:
-        values[i] = value.replace('🟊', '')
-        values[i] = int(values[i])
-        i += 1
-    return values
-
+# gets the drivers names and values of their stats
 d1_name, d1_values = get_driver_one_values()
 d2_name, d2_values = get_driver_two_values()
 
+# removes the star symbol from the drivers values
 d1_values_stars_removed = remove_stars(d1_values)
 d2_values_stars_removed = remove_stars(d2_values)
 
+# compares drivers values and prints the results
 print(compare_drivers(d1_name, d1_values_stars_removed, d2_name, d2_values_stars_removed))
 input('\nPress enter to see a graph comparing both drivers.')
 print('''
