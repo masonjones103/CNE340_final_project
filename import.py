@@ -149,23 +149,29 @@ Kaylie's analysis:
 Press enter:
 ''')
 # Drivers vs. AC & WG
+
+# getting first 10 driver
 df = df.loc[:10]
 
+# converting to integers
 if "AC" in df.columns and "OF" in df.columns:
     df["AC"] = pd.to_numeric(df["AC"], errors='coerce')
     df["OF"] = pd.to_numeric(df["OF"], errors='coerce')
 
+# finding the mean value in AC and OF
     AC_M = df["AC"].mean()
     OF_M = df["OF"].mean()
 
+# going to each row and seeing if the values are greater/less than the mean value
     for drivers, row in df.iterrows():
         ac_dis_adv = "AC Advantage" if row["AC"] > AC_M else "AC Disadvantage"
         of_dis_adv = "OF Advantage" if row["OF"] > OF_M else "OF Disadvantage"
-        print(f"{row['Driver']} has {ac_dis_adv} & {of_dis_adv}")
-
+    
+# bar graph
     bar_width = 0.40
     x = np.arange(len(df))
     plt.figure(figsize=(15, 6))
+# creating a pink bar and purple bar
     plt.bar(x - bar_width / 2, df["AC"], label="AC", alpha=0.8, color='pink', width=bar_width)
     plt.bar(x + bar_width / 2, df["OF"], label="OF", alpha=0.8, color="purple", width=bar_width)
 
